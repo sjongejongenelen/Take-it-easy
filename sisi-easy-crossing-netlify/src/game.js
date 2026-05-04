@@ -113,7 +113,7 @@
   }
 
   function musicRate() {
-    return 0.64;
+    return 0.72;
   }
 
   function makeWalkers() {
