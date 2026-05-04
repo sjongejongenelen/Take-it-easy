@@ -4,6 +4,7 @@ const STORE_NAME = "sisi-slowscores";
 const ENTRY_PREFIX = "entries/";
 const MAX_NAME_LENGTH = 14;
 const MAX_SCORE_SECONDS = 60 * 60 * 6;
+const DEFAULT_SCORES = [{ name: "Easy Stef", score: 336.4, createdAt: "2026-05-04T00:00:00.000Z" }];
 
 const headers = {
   "Access-Control-Allow-Headers": "Content-Type",
@@ -31,14 +32,23 @@ function cleanScore(value) {
 }
 
 function cleanScores(scores) {
-  return scores
+  const bestByName = new Map();
+  scores
     .filter((entry) => entry && typeof entry.name === "string" && Number.isFinite(entry.score))
-    .map((entry) => ({
-      name: cleanName(entry.name),
-      score: cleanScore(entry.score),
-      createdAt: entry.createdAt || new Date().toISOString(),
-    }))
-    .filter((entry) => entry.score !== null)
+    .forEach((entry) => {
+      const score = cleanScore(entry.score);
+      if (score === null) return;
+
+      const cleaned = {
+        name: cleanName(entry.name),
+        score,
+        createdAt: entry.createdAt || new Date().toISOString(),
+      };
+      const existing = bestByName.get(cleaned.name);
+      if (!existing || cleaned.score > existing.score) bestByName.set(cleaned.name, cleaned);
+    });
+
+  return Array.from(bestByName.values())
     .sort((a, b) => b.score - a.score)
     .slice(0, 10);
 }
@@ -64,7 +74,7 @@ async function readScores() {
     }),
   );
 
-  return cleanScores(entries);
+  return cleanScores([...DEFAULT_SCORES, ...entries]);
 }
 
 async function saveScore(payload) {

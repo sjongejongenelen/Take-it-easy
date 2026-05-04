@@ -26,6 +26,7 @@
   const WALKER_SPEED_BOOST = 2.05;
   const SCORES_KEY = "sisi-easy-crossing-slowscores";
   const SCORE_ENDPOINT = "/.netlify/functions/scores";
+  const DEFAULT_SCORES = [{ name: "Easy Stef", score: 336.4 }];
   const PLAYER_DRAW_W = 92;
   const PLAYER_DRAW_H = 116;
   const PLAYER_DRAW_Y_OFFSET = 92;
@@ -164,21 +165,29 @@
 
   function cleanScores(scores) {
     if (!Array.isArray(scores)) return [];
-    return scores
+    const bestByName = new Map();
+    scores
       .filter((entry) => entry && typeof entry.name === "string" && Number.isFinite(entry.score))
-      .map((entry) => ({
+      .forEach((entry) => {
+        const score = {
         name: entry.name.trim().replace(/\s+/g, " ").slice(0, 14) || "Easy speler",
         score: Math.max(0, entry.score),
-      }))
+        };
+        const existing = bestByName.get(score.name);
+        if (!existing || score.score > existing.score) bestByName.set(score.name, score);
+      });
+
+    return Array.from(bestByName.values())
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
   }
 
   function readLocalScores() {
     try {
-      return cleanScores(JSON.parse(localStorage.getItem(SCORES_KEY) || "[]"));
+      const stored = JSON.parse(localStorage.getItem(SCORES_KEY) || "[]");
+      return cleanScores([...DEFAULT_SCORES, ...stored]);
     } catch {
-      return [];
+      return cleanScores(DEFAULT_SCORES);
     }
   }
 
@@ -345,10 +354,10 @@
   }
 
   function movePlayer(dx, dy) {
+    if (state.finished) return;
     if (!state.running) {
       startGame();
     }
-    if (state.finished) return;
     if (player.moving || player.invulnerable > 0.25) return;
     const nextCol = Math.max(0, Math.min(COLS - 1, player.col + dx));
     const nextRow = Math.max(0, Math.min(ROWS - 1, player.row + dy));
@@ -761,6 +770,14 @@
   }
 
   function onKey(event) {
+    const target = event.target;
+    const isTyping =
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement ||
+      target?.isContentEditable;
+    if (isTyping) return;
+
     const key = event.key.toLowerCase();
     if (key === "arrowup" || key === "w") {
       event.preventDefault();
