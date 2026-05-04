@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sisi Easy Crossing</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <section class="game-stage" aria-label="Sisi Easy Crossing">
+        <canvas id="game" width="1280" height="720"></canvas>
+
+        <div class="score-clock" id="scoreClock" aria-live="polite">
+          <span class="score-label">SLOWSCORE</span>
+          <strong id="scoreValue" class="score-value">00:00.0</strong>
+        </div>
+
+        <div class="start-overlay" id="startOverlay">
+          <div class="logo-lockup" id="logoLockup">
+            <span id="logoLine">TAKE IT EASY,</span>
+            <strong id="logoMain">TAKE A SISI</strong>
+          </div>
+          <p id="overlayScore" class="overlay-score"></p>
+          <form id="scoreForm" class="score-form" autocomplete="off">
+            <label for="playerName">Naam</label>
+            <div class="score-entry-row">
+              <input id="playerName" name="playerName" maxlength="14" placeholder="Rustige held" />
+              <button id="saveScoreButton" type="submit">Bewaar score</button>
+            </div>
+          </form>
+          <section class="ranking-panel" aria-label="Slowscore ranking">
+            <h2>SLOWSCORE RANKING</h2>
+            <ol id="rankingList" class="ranking-list"></ol>
+          </section>
+          <button id="startButton" class="primary-action" type="button">Start easy</button>
+        </div>
+
+        <div class="touch-pad" aria-label="Besturing">
+          <button type="button" data-move="up" aria-label="Omhoog">▲</button>
+          <button type="button" data-move="left" aria-label="Links">◀</button>
+          <button type="button" data-move="right" aria-label="Rechts">▶</button>
+        </div>
+      </section>
+    </main>
+
+    <audio id="music" src="assets/sisi-song-slow-8bit.wav" preload="auto" loop></audio>
+    <script src="src/game.js"></script>
+  </body>
+</html>
