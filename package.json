@@ -1,0 +1,12 @@
+{
+  "name": "sisi-easy-crossing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/game.js && node --check netlify/functions/scores.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
