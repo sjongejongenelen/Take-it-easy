@@ -18,7 +18,7 @@
   const W = canvas.width;
   const H = canvas.height;
   const ROWS = 12;
-  const COLS = 20;
+  const COLS = 11;
   const CELL_W = W / COLS;
   const CELL_H = H / ROWS;
   const START_COL = Math.floor(COLS / 2);
@@ -38,15 +38,29 @@
   const background = new Image();
   background.src = "assets/sisi-background-pixel.png";
 
+  function syncViewportSize() {
+    const viewport = window.visualViewport;
+    const height = Math.max(320, Math.round(viewport?.height || window.innerHeight));
+    document.documentElement.style.setProperty("--app-height", `${height}px`);
+  }
+
+  syncViewportSize();
+  window.addEventListener("resize", syncViewportSize, { passive: true });
+  window.addEventListener("orientationchange", () => window.setTimeout(syncViewportSize, 120), { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncViewportSize, { passive: true });
+    window.visualViewport.addEventListener("scroll", syncViewportSize, { passive: true });
+  }
+
   const lanes = [
-    { row: 2, dir: 1, speed: 8.2, count: 3, offset: 80 },
-    { row: 3, dir: -1, speed: 5.8, count: 5, offset: 220 },
-    { row: 4, dir: 1, speed: 7.4, count: 4, offset: 390 },
-    { row: 5, dir: -1, speed: 6.4, count: 5, offset: 20 },
-    { row: 7, dir: 1, speed: 5.8, count: 5, offset: 160 },
-    { row: 8, dir: -1, speed: 6.4, count: 4, offset: 520 },
-    { row: 9, dir: 1, speed: 8.2, count: 3, offset: 710 },
-    { row: 10, dir: -1, speed: 7.4, count: 4, offset: 310 },
+    { row: 2, dir: 1, speed: 8.2, count: 2, offset: 45 },
+    { row: 3, dir: -1, speed: 5.8, count: 3, offset: 124 },
+    { row: 4, dir: 1, speed: 7.4, count: 2, offset: 219 },
+    { row: 5, dir: -1, speed: 6.4, count: 3, offset: 11 },
+    { row: 7, dir: 1, speed: 5.8, count: 3, offset: 90 },
+    { row: 8, dir: -1, speed: 6.4, count: 2, offset: 293 },
+    { row: 9, dir: 1, speed: 8.2, count: 2, offset: 399 },
+    { row: 10, dir: -1, speed: 7.4, count: 2, offset: 174 },
   ];
 
   const state = {
@@ -639,20 +653,39 @@
     rect(x + 11, y + 24, 12, 4, "#ffffff");
   }
 
+  function drawCoverImage(image) {
+    const sourceAspect = image.naturalWidth / image.naturalHeight;
+    const targetAspect = W / H;
+    let sx = 0;
+    let sy = 0;
+    let sw = image.naturalWidth;
+    let sh = image.naturalHeight;
+
+    if (sourceAspect > targetAspect) {
+      sw = image.naturalHeight * targetAspect;
+      sx = (image.naturalWidth - sw) / 2;
+    } else {
+      sh = image.naturalWidth / targetAspect;
+      sy = (image.naturalHeight - sh) / 2;
+    }
+
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, W, H);
+  }
+
   function drawTitleBanner() {
-    const bannerW = Math.min(720, W - 36);
+    const bannerW = Math.min(650, W - 28);
     const x = (W - bannerW) / 2;
-    rect(x, 8, bannerW, 48, "rgba(27, 23, 51, 0.84)");
-    rect(x + 5, 13, bannerW - 10, 38, "rgba(255, 103, 19, 0.88)");
+    rect(x, 16, bannerW, 58, "rgba(27, 23, 51, 0.84)");
+    rect(x + 5, 21, bannerW - 10, 46, "rgba(255, 103, 19, 0.88)");
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
-    ctx.font = "900 30px Arial Black, Impact, sans-serif";
-    ctx.fillText("Take it Easy, Take a Sisi.", W / 2, 40);
+    ctx.font = "900 28px Arial Black, Impact, sans-serif";
+    ctx.fillText("Take it Easy, Take a Sisi.", W / 2, 55);
   }
 
   function drawWorld() {
     if (background.complete && background.naturalWidth > 0) {
-      ctx.drawImage(background, 0, 0, W, H);
+      drawCoverImage(background);
     } else {
       rect(0, 0, W, H, "#ff6713");
     }
@@ -682,7 +715,7 @@
         rect(0, y, W, 4, "#3e4150");
         rect(0, y + CELL_H - 4, W, 4, "#777b8a");
         for (let x = 18; x < W; x += 70) {
-          rect(x, y + 30, 36, 4, "#fff5ca");
+          rect(x, y + CELL_H / 2, 36, 4, "#fff5ca");
         }
       }
     }

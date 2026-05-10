@@ -1,0 +1,9 @@
+{
+  "name": "Sisi Easy Crossing",
+  "short_name": "Sisi Easy",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#ff6713",
+  "theme_color": "#ff6713"
+}
